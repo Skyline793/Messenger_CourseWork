@@ -41,7 +41,7 @@ void User::SetSex(const QString &sex)
 bool User::Connect(const QString& addr, int port)
 {
     socket->connectToHost(addr, port);
-    return socket->waitForConnected(5000);
+    return socket->waitForConnected(3000);
 }
 
 int User::GetID()
@@ -70,6 +70,7 @@ void User::HandleReadyRead()
     in.setVersion(QDataStream::Qt_6_2);
     if(in.status() != QDataStream::Ok)
         return;
+    //циклически получаем блоки, пока не получим все сообщение
     while(true)
     {
         if(blockSize != 0 || socket->bytesAvailable() < 2)
@@ -78,7 +79,7 @@ void User::HandleReadyRead()
         if(socket->bytesAvailable() < blockSize)
             return;
         blockSize = 0;
-        emit NewMessage(in);
+        emit NewCommand(in);
     }
 }
 

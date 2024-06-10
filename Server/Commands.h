@@ -2,7 +2,7 @@
 #define COMMANDS_H
 
 ///
-/// \brief Перечисления передаваемых команд
+/// \brief Перечисление передаваемых команд
 ///
 enum Commands
 {
@@ -19,7 +19,7 @@ enum Commands
     NewChat, //рассылка нового чата
     UserlistRequest, //запрос списка пользователей
     Userlist, //ответ на запрос списка пользователей
-    ChatHistoryRequest, //запрос истории сообщений
+    ChatHistoryRequest, //запрос истории чатов сообщений
     ChatHistory //ответ на запрос истории сообщений
 };
 

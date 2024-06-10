@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+
 #include "server.h"
 #include "consolelogger.h"
 #include "txtlogger.h"

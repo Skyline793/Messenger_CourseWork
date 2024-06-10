@@ -5,13 +5,14 @@ ChatController::ChatController(User* user, QObject *parent)
 {
     this->user = user;
     this->activeChatID = -1;
-    connect(user, &User::NewMessage, this, &ChatController::HandleNewCommand);
+    connect(user, &User::NewCommand, this, &ChatController::HandleNewCommand);
     connect(user, &User::ClientDisconnected, this, &ChatController::HandleClientDisconnected);
 }
 
 void ChatController::HandleNewCommand(QDataStream& in) {
     Commands cmd;
     in >> cmd;
+    //Вызываем обработчик в зависимости от поступившей команды
     switch(cmd)
     {
     case Commands::LogInSuccess:
@@ -46,7 +47,7 @@ void ChatController::HandleNewCommand(QDataStream& in) {
 
 void ChatController::HandleClientDisconnected()
 {
-    emit ClientDisconnected();
+    emit Disconnection();
 }
 
 void ChatController::SortChats()
@@ -138,7 +139,6 @@ void ChatController::ProcessLoginSuccess(QDataStream &in)
     QString nickname;
     QString sex;
     in >> id >> nickname >> sex;
-    qDebug() << id << nickname << sex;
     user->SetID(id);
     user->SetNickname(nickname);
     user->SetSex(sex);
@@ -198,7 +198,7 @@ void ChatController::SendMessage(const QString& text)
     }
 }
 
-void ChatController::CreateGroupChat(QString nazv, QStringList members)
+void ChatController::CreateGroupChat(const QString& nazv, QStringList members)
 {
     members.append(user->GetNickname());
     data.clear();
@@ -210,7 +210,7 @@ void ChatController::CreateGroupChat(QString nazv, QStringList members)
     user->SendData(data);
 }
 
-void ChatController::CreatePersonalChat(QString member)
+void ChatController::CreatePersonalChat(const QString& member)
 {
     QStringList members;
     members.append(user->GetNickname());
@@ -299,7 +299,6 @@ QList<QPair<int, QString>> ChatController::GetChatsList()
     }
     return list;
 }
-
 
 void ChatController::SetActiveChat(int chatID)
 {

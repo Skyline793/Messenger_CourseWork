@@ -1,18 +1,12 @@
 #include "database.h"
-#include <QSqlQuery>
-#include <QSqlError>
-#include <QVariant>
-#include <QDebug>
-#include <QDateTime>
 
 Database::Database(const QString &dbName) {
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(dbName);
     if (!db.open()) {
-        qDebug() << "Ошибка: не удалось подключиться к базе данных";
+        qCritical() << "Ошибка: не удалось подключиться к базе данных";
     }
     else {
-        qDebug() << "Успешное подключение к базе данных";
         QSqlQuery query;
         query.exec(                   "CREATE TABLE IF NOT EXISTS users ("
                                       "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -70,6 +64,7 @@ int Database::AddPersonalChat(const QString& members)
     }
     return id;
 }
+
 int Database::AddGroupChat(const QString& nazv, const QString& members)
 {
     int id = 0;
@@ -88,6 +83,7 @@ int Database::AddGroupChat(const QString& nazv, const QString& members)
     }
     return id;
 }
+
 bool Database::AddMessage(const int chatID, const int senderID, const QString& date, const QString& text)
 {
     QSqlQuery query;
@@ -96,13 +92,6 @@ bool Database::AddMessage(const int chatID, const int senderID, const QString& d
     query.bindValue(":sender", senderID);
     query.bindValue(":date", date);
     query.bindValue(":text", text);
-    return query.exec();
-}
-
-bool Database::RemoveUser(const QString &nickname) {
-    QSqlQuery query;
-    query.prepare("DELETE FROM users WHERE nickname = :nickname");
-    query.bindValue(":nickname", nickname);
     return query.exec();
 }
 
@@ -127,7 +116,7 @@ bool Database::IsChatExists(const QString &nazv, const QString &members)
     return query.next();
 }
 
-QVector<int> Database::GetChatMembers(int chatID)
+QVector<int> Database::GetChatMembers(const int chatID)
 {
     QSqlQuery query;
     QVector<int> chatMembers;
@@ -145,7 +134,7 @@ QVector<int> Database::GetChatMembers(int chatID)
     return chatMembers;
 }
 
-QStringList Database::GetUserChats(int userID)
+QStringList Database::GetUserChats(const int userID)
 {
     QSqlQuery query;
     QStringList chats;
@@ -169,7 +158,7 @@ QStringList Database::GetUserChats(int userID)
     return chats;
 }
 
-QStringList Database::GetChatMessages(int chatID)
+QStringList Database::GetChatMessages(const int chatID)
 {
     QSqlQuery query;
     QStringList messages;
@@ -198,7 +187,7 @@ int Database::GetUserID(const QString& nickname)
     return id;
 }
 
-QString Database::GetUserNickname(int userID)
+QString Database::GetUserNickname(const int userID)
 {
     QString nickname;
     QSqlQuery query;
@@ -212,7 +201,7 @@ QString Database::GetUserNickname(int userID)
     return nickname;
 }
 
-QString Database::GetUserSex(int userID)
+QString Database::GetUserSex(const int userID)
 {
     QString sex;
     QSqlQuery query;

@@ -1,12 +1,17 @@
 #ifndef TXTLOGGER_H
 #define TXTLOGGER_H
 
+#include <QFile>
+#include <QDateTime>
+#include <QDebug>
+
 #include "ilogger.h"
 
 ///
 /// \brief Класс логгера в текстовый файл
 ///
 class TxtLogger : public ILogger {
+     //публичные методы
 public:
     TxtLogger();
     ///
@@ -25,6 +30,7 @@ public:
     ///
     virtual void LogDisconnection(const QString &clientInfo);
 
+    //приватные методы
 private:
     ///
     /// \brief Сгенерировать имя файла
@@ -32,6 +38,8 @@ private:
     ///
     QString GenerateLogFileName();
 
+    //приватные поля
+private:
     ///
     /// \brief имя файла с логами
     ///

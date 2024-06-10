@@ -1,7 +1,5 @@
 #include "chatcreationwindow.h"
 #include "ui_chatcreationwindow.h"
-#include <QStringListModel>
-#include <QMessageBox>
 
 ChatCreationWindow::ChatCreationWindow(ChatController* cc, QWidget *parent) :
     QDialog(parent),
@@ -38,7 +36,6 @@ void ChatCreationWindow::on_personal_radioButton_clicked()
     ui->users_listView->setSelectionMode(QAbstractItemView::SingleSelection);
 }
 
-
 void ChatCreationWindow::on_group_radioButton_clicked()
 {
     ui->users_listView->clearSelection();
@@ -47,7 +44,6 @@ void ChatCreationWindow::on_group_radioButton_clicked()
     ui->nazv_lineEdit->setPlaceholderText("Ведите название чата");
     ui->users_listView->setSelectionMode(QAbstractItemView::MultiSelection);
 }
-
 
 void ChatCreationWindow::on_create_pushButton_clicked()
 {
@@ -60,6 +56,7 @@ void ChatCreationWindow::on_create_pushButton_clicked()
         CreateGroupChat();
     }
     this->close();
+    delete this;
 }
 
 void ChatCreationWindow::CreatePersonalChat()

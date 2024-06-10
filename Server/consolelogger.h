@@ -1,12 +1,16 @@
 #ifndef CONSOLELOGGER_H
 #define CONSOLELOGGER_H
 
+#include <QDebug>
+#include <QDateTime>
+
 #include "ilogger.h"
 
 ///
 /// \brief Класс логгера в консоль
 ///
 class ConsoleLogger : public ILogger {
+    //публичные методы
 public:
     ///
     /// \brief Логирование запуска сервера

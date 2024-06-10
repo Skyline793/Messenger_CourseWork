@@ -1,7 +1,5 @@
 #include "loginwindow.h"
 #include "ui_loginwindow.h"
-#include "Commands.h"
-#include <QMessageBox>
 
 LoginWindow::LoginWindow(QWidget *parent) :
     QDialog(parent),
@@ -13,7 +11,7 @@ LoginWindow::LoginWindow(QWidget *parent) :
     connect(cc, &ChatController::FailedLogin, this, &LoginWindow::HandleFailedLogin);
     connect(cc, &ChatController::SuccessfulSignUp, this, &LoginWindow::HandleSuccessfulSignUp);
     connect(cc, &ChatController::FailedSignUp, this, &LoginWindow::HandleFailedSignUp);
-    settings = new LoginSettings();
+    LoginSettings* settings =  LoginSettings::GetInstance();
     ui->authorization_tabWidget->setCurrentIndex(0);
     if(settings->IsConfigured())
     {
@@ -29,14 +27,13 @@ LoginWindow::LoginWindow(QWidget *parent) :
 LoginWindow::~LoginWindow()
 {
     delete ui;
-    delete settings;
 }
 
 void LoginWindow::HandleSuccesfulLogin()
 {
     QMessageBox::information(this, "Вход", "Вы успешно вошли в свой аккаунт");
     emit AuthorizationSucceded(cc);
-    this->close();
+    delete this;
 }
 
 void LoginWindow::HandleFailedLogin()
@@ -68,9 +65,6 @@ void LoginWindow::HandleFailedSignUp()
     ui->authorization_tabWidget->setCurrentIndex(0);
 }
 
-
-
-
 void LoginWindow::on_connectToServer_pushButton_clicked()
 {
     QString addr = ui->serverAddr_lineEdit->text().trimmed();
@@ -101,7 +95,6 @@ void LoginWindow::on_connectToServer_pushButton_clicked()
     ui->connectToServer_pushButton->setEnabled(false);
 }
 
-
 void LoginWindow::on_login_pushButton_clicked()
 {
     QString nickname = ui->loginNickname_lineEdit->text().trimmed();
@@ -118,6 +111,7 @@ void LoginWindow::on_login_pushButton_clicked()
     }
     if(ui->save_checkBox->isChecked())
     {
+        LoginSettings* settings = LoginSettings::GetInstance();
         settings->SetServerAddress(ui->serverAddr_lineEdit->text());
         settings->SetServerPort(ui->serverPort_lineEdit->text().toInt());
         settings->SetNickname(nickname);
@@ -127,17 +121,15 @@ void LoginWindow::on_login_pushButton_clicked()
     cc->Login(nickname, password);
 }
 
-
 void LoginWindow::on_resetSettings_pushButton_clicked()
 {
+    LoginSettings* settings = LoginSettings::GetInstance();
     settings->ResetSettings();
     ui->serverAddr_lineEdit->clear();
     ui->serverPort_lineEdit->clear();
     ui->loginNickname_lineEdit->clear();
     ui->loginPassword_lineEdit->clear();
 }
-
-
 
 void LoginWindow::on_signup_pushButton_clicked()
 {
@@ -185,6 +177,5 @@ void LoginWindow::on_signup_pushButton_clicked()
     ui->signupPassword_lineEdit->clear();
     ui->signupPasswordRepeat_lineEdit->clear();
     ui->sex_comboBox->setCurrentIndex(-1);
-
 }
 

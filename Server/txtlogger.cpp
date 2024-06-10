@@ -1,9 +1,4 @@
 #include "txtlogger.h"
-#include <QFile>
-#include <QTextStream>
-#include <QDateTime>
-#include <QDebug>
-
 
 TxtLogger::TxtLogger() {
     logFileName = GenerateLogFileName();

@@ -1,6 +1,6 @@
 #include "message.h"
 
-Message::Message(QString sender, QString text, QString date)
+Message::Message(const QString& sender, const QString& text, const QString& date)
 {
     this->sender = sender;
     this->text = text;

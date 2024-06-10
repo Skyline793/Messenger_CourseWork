@@ -1,12 +1,6 @@
 #include "chat.h"
 
-Chat::Chat(int chatID, QString nazv)
-{
-    this->chatID = chatID;
-    this->nazv = nazv;
-}
-
-Chat::Chat(int chatID, QString nazv, QStringList members)
+Chat::Chat(const int chatID, const QString& nazv, const QStringList& members)
 {
     this->chatID = chatID;
     this->nazv = nazv;
@@ -28,10 +22,6 @@ QStringList Chat::GetMembers()
     return membersNicks;
 }
 
-void Chat::AddMember(QString nick)
-{
-    membersNicks.append(nick);
-}
 QList<Message*> Chat::GetMessages()
 {
     return messages;
@@ -43,5 +33,8 @@ void Chat::AddMessage(Message* m)
 
 QString Chat::GetLastMessageDateTime()
 {
-    return messages.last()->GetDate();
+    if(messages.isEmpty())
+        return QString("01.01.1970 00:00:00");
+    else
+        return messages.last()->GetDate();
 }

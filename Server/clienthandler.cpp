@@ -1,5 +1,4 @@
 #include "clienthandler.h"
-#include "Commands.h"
 
 ClientHandler::ClientHandler(QTcpSocket* socket, QObject *parent)
     : QObject(parent), clientSocket(socket) {
@@ -17,11 +16,12 @@ QString ClientHandler::GetNickname() {
     return nickname;
 }
 
-void ClientHandler::SetID(int id)
+void ClientHandler::SetID(const int id)
 {
     if(id > 0)
         this->id = id;
 }
+
 int ClientHandler::GetID()
 {
     return id;
@@ -38,6 +38,7 @@ void ClientHandler::HandleReadyRead()
     in.setVersion(QDataStream::Qt_6_2);
     if(in.status() != QDataStream::Ok)
         return;
+    //циклически получаем сообщение от клиента, пока оно не придет целиком
     while(true)
     {
         if(blockSize != 0 || clientSocket->bytesAvailable() <2)
@@ -46,7 +47,7 @@ void ClientHandler::HandleReadyRead()
         if(clientSocket->bytesAvailable() < blockSize)
             return;
         blockSize = 0;
-        emit NewMessage(this, in);
+        emit NewCommand(this, in);
     }
 }
 

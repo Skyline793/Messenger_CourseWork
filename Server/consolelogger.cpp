@@ -1,6 +1,4 @@
 #include "consolelogger.h"
-#include <QDebug>
-#include <QDateTime>
 
 void ConsoleLogger::LogStart(const QString &port)
 {

@@ -14,7 +14,6 @@ SOURCES += \
         clienthandler.cpp \
         consolelogger.cpp \
         database.cpp \
-        ilogger.cpp \
         main.cpp \
         server.cpp \
         txtlogger.cpp

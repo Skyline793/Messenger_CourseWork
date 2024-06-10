@@ -1,15 +1,5 @@
 #include "messengerwindow.h"
 #include "ui_messengerwindow.h"
-#include <QStandardItemModel>
-#include <QMessageBox>
-#include "chatcreationwindow.h"
-
-MessengerWindow::MessengerWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MessengerWindow)
-{
-    ui->setupUi(this);
-}
 
 MessengerWindow::MessengerWindow(ChatController *cc, QWidget *parent)
     : QMainWindow(parent)
@@ -19,9 +9,9 @@ MessengerWindow::MessengerWindow(ChatController *cc, QWidget *parent)
     this->cc = cc;
     cc->setParent(this);
     cc->RequestChatHistory();
-    connect(cc, &ChatController::ChatsListUpdated, this, &MessengerWindow::UpdateChatsListView);
+    connect(cc, &ChatController::ChatsListUpdated, this, &MessengerWindow::HandleChatsListUpdated);
     connect(cc, &ChatController::NewMessage, this, &MessengerWindow::HandleNewMessage);
-    connect(cc, &ChatController::ClientDisconnected, this, &MessengerWindow::HandleDisconnection);
+    connect(cc, &ChatController::Disconnection, this, &MessengerWindow::HandleDisconnection);
     connect(cc, &ChatController::FailedNewChat, this, &MessengerWindow::HandleFailedNewChat);
 }
 
@@ -47,7 +37,6 @@ void MessengerWindow::HandleNewMessage(int chatID)
             }
         }
     }
-
 }
 
 void MessengerWindow::HandleDisconnection()
@@ -56,7 +45,7 @@ void MessengerWindow::HandleDisconnection()
     this->close();
 }
 
-void MessengerWindow::UpdateChatsListView(QList<QPair<int, QString>> chats)
+void MessengerWindow::HandleChatsListUpdated(QList<QPair<int, QString>> chats)
 {
     QAbstractItemModel* oldModel = ui->chats_listView->model();
     QStandardItemModel *model = new QStandardItemModel(this);
@@ -150,7 +139,7 @@ void MessengerWindow::on_chatInfo_pushButton_clicked()
 
 void MessengerWindow::on_newChat_pushButton_clicked()
 {
-   ChatCreationWindow* w = new ChatCreationWindow(cc, this);
-   w->show();
+   ChatCreationWindow* window = new ChatCreationWindow(cc, this);
+   window->show();
 }
 

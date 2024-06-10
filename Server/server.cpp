@@ -1,8 +1,4 @@
 #include "server.h"
-#include <QDataStream>
-#include <QTextStream>
-#include <QDebug>
-#include "Commands.h"
 
 Server::~Server()
 {
@@ -15,7 +11,7 @@ Server::Server(Database* db, QObject *parent)
     : QObject(parent) {
     myServer = new QTcpServer(this);
     this->db = db;
-    connect(myServer, &QTcpServer::newConnection, this, &Server::NewConnection);
+    connect(myServer, &QTcpServer::newConnection, this, &Server::HandleNewConnection);
 }
 
 void Server::StartServer(int nPort)
@@ -33,35 +29,42 @@ void Server::AddLogger(ILogger *logger)
     this->loggers.append(logger);
 }
 
-void Server::NewConnection() {
+void Server::RemoveLogger(ILogger *logger)
+{
+    if(loggers.contains(logger))
+        loggers.removeOne(logger);
+}
+
+void Server::HandleNewConnection() {
     QTcpSocket *socket = myServer->nextPendingConnection();
     ClientHandler *handler = new ClientHandler(socket, this);
-    connect(handler, &ClientHandler::NewMessage, this, &Server::HandleNewCommand);
+    connect(handler, &ClientHandler::NewCommand, this, &Server::HandleNewCommand);
     connect(handler, &ClientHandler::ClientDisconnected, this, &Server::HandleClientDisconnected);
 }
 
 void Server::HandleNewCommand(ClientHandler* client, QDataStream& in) {
     Commands cmd;
     in >> cmd;
+    //в зависимости от поступившей команды, вызываем соотвествующий обработчик
     switch(cmd)
     {
     case Commands::LogInRequest:
-        LogInClient(client, in);
+        ProcessLogInRequest(client, in);
         break;
     case Commands::SignUpRequest:
-        SignUpClient(client, in);
+        ProcessSignUpRequest(client, in);
         break;
     case Commands::OutcomingMessage:
-        ForwardMessage(in);
+        ProcessOutcomingMessage(in);
         break;
     case Commands::UserlistRequest:
-        SendUserlist(client);
+        ProcessUserlistRequest(client);
         break;
     case Commands::ChatHistoryRequest:
-        SendChatsHistory(client);
+        ProcessChatHistoryRequest(client);
         break;
     case Commands::NewChatRequest:
-        AddNewChat(client, in);
+        ProcessNewChatRequest(client, in);
     }
 }
 
@@ -76,7 +79,7 @@ void Server::HandleClientDisconnected(ClientHandler* client)
     delete client;
 }
 
-void Server::LogInClient(ClientHandler* client, QDataStream& in)
+void Server::ProcessLogInRequest(ClientHandler* client, QDataStream& in)
 {
     QString nickname;
     QString password;
@@ -103,7 +106,7 @@ void Server::LogInClient(ClientHandler* client, QDataStream& in)
     }
 }
 
-void Server::SignUpClient(ClientHandler* client, QDataStream& in)
+void Server::ProcessSignUpRequest(ClientHandler* client, QDataStream& in)
 {
     QString nickname;
     QString name;
@@ -127,7 +130,7 @@ void Server::SignUpClient(ClientHandler* client, QDataStream& in)
     }
 }
 
-void Server::ForwardMessage(QDataStream& in)
+void Server::ProcessOutcomingMessage(QDataStream& in)
 {
     int chatID;
     int senderID;
@@ -155,7 +158,7 @@ void Server::ForwardMessage(QDataStream& in)
     }
 }
 
-void Server::SendUserlist(ClientHandler* client)
+void Server::ProcessUserlistRequest(ClientHandler* client)
 {
 
     QStringList users = db->GetUserNicknames();
@@ -169,7 +172,7 @@ void Server::SendUserlist(ClientHandler* client)
     client->SendData(data);
 }
 
-void Server::SendChatsHistory(ClientHandler* client)
+void Server::ProcessChatHistoryRequest(ClientHandler* client)
 {
     QStringList chats = db->GetUserChats(client->GetID());
     foreach(QString chat, chats)
@@ -184,7 +187,7 @@ void Server::SendChatsHistory(ClientHandler* client)
     }
 }
 
-void Server::AddNewChat(ClientHandler* client, QDataStream &in)
+void Server::ProcessNewChatRequest(ClientHandler* client, QDataStream &in)
 {
     int chatID = 0;
     QString nazv;

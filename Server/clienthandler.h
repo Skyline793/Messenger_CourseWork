@@ -2,15 +2,14 @@
 #define CLIENTHANDLER_H
 
 #include <QTcpSocket>
-#include <QObject>
 #include <QString>
 
 ///
-/// \brief Класс обработчика Клиента
+/// \brief Класс хендлера Клиента
 ///
 class ClientHandler : public QObject {
     Q_OBJECT
-
+    //Публичные методы
 public:
     ClientHandler(QTcpSocket* socket, QObject *parent = nullptr);
     ///
@@ -27,7 +26,7 @@ public:
     /// \brief Сеттер id клиента
     /// \param id клиента
     ///
-    void SetID(int id);
+    void SetID(const int id);
     ///
     /// \brief геттер id клиента
     /// \return id клиента
@@ -39,19 +38,21 @@ public:
     ///
     void SendData(QByteArray& data);
 
+    //сигналы
 signals:
     ///
-    /// \brief Сигнал о новом сообщении от сервера
+    /// \brief Сигнал о новом сообщении от клиента
     /// \param client - указатель на клиента
     /// \param in - ссылка на поток данных
     ///
-    void NewMessage(ClientHandler* client, QDataStream& in);
+    void NewCommand(ClientHandler* client, QDataStream& in);
     ///
     /// \brief Сигнал об отключении клиента от хоста
     /// \param указатель на клиента
     ///
     void ClientDisconnected(ClientHandler* client);
 
+    //Приватные слоты
 private slots:
     ///
     /// \brief Обрабочик сигнала readyRead
@@ -62,6 +63,7 @@ private slots:
     ///
     void HandleDisconnected();
 
+    //приватные поля
 private:
     ///
     /// \brief id клиента
